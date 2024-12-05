@@ -37,10 +37,14 @@ courseRouter.post("/create-course", (req: Request, res: Response) => {
 });
 
 // normal / get
-// app.get('/', (req: Request, res:Response) => {
-//     console.log(req.params);
-//   res.send('Hello developers!')
-// })
+app.get("/", (req: Request, res: Response, next: NextFunction) => {
+  try {
+    res.send(something);
+  } catch (error) {
+    // we can send normal error status and json here, but sending the error to global error handler middleware.
+    next(error);
+  }
+});
 
 //param
 // app.get('/:id', (req: Request, res:Response) => {
@@ -50,7 +54,7 @@ courseRouter.post("/create-course", (req: Request, res: Response) => {
 
 //multiple params
 // app.get('/:id/:subId', (req: Request, res:Response) => {
-//     console.log(req.params);
+//     console.log(req.params.id, req.params.subId);
 //   res.send('Hello developers!')
 // })
 
@@ -75,4 +79,20 @@ app.post("/", (req: Request, res: Response) => {
   });
 });
 
+//  route error handle // has to be at the end of all route controllers
+app.all("*", (req: Request, res: Response) => {
+  res.status(400).json({
+    success: false,
+    message: "Route not found",
+  });
+});
+//  global error handler controller
+app.use((error: any, req: Request, res: Response, next: NextFunction) => {
+  if (error) {
+    res.status(400).json({
+      success: false,
+      message: "Something went wrong (from global error handler )",
+    });
+  }
+});
 export default app;
